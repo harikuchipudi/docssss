@@ -1,0 +1,67 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam dpi 150
+
+' ==== FRONTEND ====
+class TrainerDashboardUI {
+  +viewAssignedCohorts(trainerId)
+  +viewTrainerConnect(cohortId, date)
+  +updateTrainerConnect(trainerConnectId, TrainerConnectDTO)
+  +acknowledgeTrainerConnect(trainerConnectId)
+}
+
+' ==== CONTROLLER ====
+class TrainerDashboardController {
+  +getAssignedCohorts(trainerId): List<CohortDTO>
+  +getTrainerConnect(cohortId, date): TrainerConnectDTO
+  +updateTrainerConnect(trainerConnectId, TrainerConnectDTO): TrainerConnectDTO
+  +acknowledgeTrainerConnect(trainerConnectId): TrainerConnectDTO
+}
+
+' ==== SERVICE ====
+class TrainerDashboardService {
+  +getAssignedCohorts(trainerId): List<CohortDTO>
+  +getTrainerConnect(cohortId, date): TrainerConnectDTO
+  +updateTrainerConnect(trainerConnectId, TrainerConnectDTO): TrainerConnectDTO
+  +acknowledgeTrainerConnect(trainerConnectId): TrainerConnectDTO
+}
+
+' ==== REPOSITORIES ====
+interface CohortRepository
+interface TrainerConnectRepository
+
+' ==== ENTITIES ====
+class Cohort {
+  -id: Long
+  -title: String
+  -trainerId: Long
+}
+
+class TrainerConnect {
+  -id: Long
+  -cohortId: Long
+  -date: LocalDate
+  -summary: String
+  -acknowledged: Boolean
+}
+
+' ==== DTOs ====
+class CohortDTO
+class TrainerConnectDTO
+
+' ==== RELATIONSHIPS ====
+TrainerDashboardUI -[#blue]-> TrainerDashboardController : (1) Request
+TrainerDashboardController -[#green]-> TrainerDashboardService : (2) Business logic
+TrainerDashboardService -[#orange]-> CohortRepository
+TrainerDashboardService -[#orange]-> TrainerConnectRepository
+TrainerDashboardService -[#green]-> TrainerDashboardController : (3) Return
+TrainerDashboardController -[#blue]-> TrainerDashboardUI : (4) Respond
+
+CohortRepository --> Cohort
+TrainerConnectRepository --> TrainerConnect
+
+Cohort --> CohortDTO
+TrainerConnect --> TrainerConnectDTO
+
+@enduml

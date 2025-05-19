@@ -1,0 +1,99 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam dpi 150
+
+' === FRONTEND ===
+class LoginForm {
+  +username: String
+  +password: String
+  +submit()
+}
+
+class LoginRequest {
+  -username: String
+  -password: String
+}
+
+class LoginResponse {
+  -token: String
+  -message: String
+}
+
+' === CONTROLLER ===
+class LoginController {
+  +ResponseEntity<LoginResponse> login(LoginRequest request)
+}
+
+' === SPRING SECURITY FILTERS ===
+class SecurityFilterChain
+class UsernamePasswordAuthenticationFilter {
+  +attemptAuthentication(request, response)
+}
+
+' === SPRING SECURITY CORE ===
+class AuthenticationManager {
+  +authenticate(Authentication)
+}
+
+class DaoAuthenticationProvider {
+  +authenticate(Authentication)
+}
+
+class PasswordEncoder {
+  +matches(raw, encoded)
+}
+
+' === USER DETAILS ===
+interface UserDetailsService {
+  +loadUserByUsername(String username)
+}
+
+interface UserRepository {
+  +findByUsername(String username)
+}
+
+class User implements UserDetails {
+  -id: Long
+  -username: String
+  -password: String
+  -authorities: List<Role>
+}
+
+' === JWT & AUTH SERVICE ===
+class AuthService {
+  +generateToken(UserDetails)
+}
+
+class JwtUtil {
+  +generateToken(UserDetails)
+  +validateToken(String token)
+}
+
+' === STEP FLOW LABELS ===
+LoginForm -[#blue]-> LoginRequest : (1) Fill + Submit Form
+LoginRequest -[#blue]-> LoginController : (2) POST /api/login
+LoginController -[#green]-> AuthenticationManager : (3) authenticate()
+AuthenticationManager -[#green]-> DaoAuthenticationProvider : (4)
+DaoAuthenticationProvider -[#green]-> UserDetailsService : (5) loadUserByUsername()
+UserDetailsService -[#green]-> UserRepository : (6) findByUsername()
+UserRepository -[#green]-> User : (7) returns User
+DaoAuthenticationProvider -[#green]-> PasswordEncoder : (8) matches()
+PasswordEncoder -[#green]-> DaoAuthenticationProvider : (9) returns match result
+DaoAuthenticationProvider -[#green]-> AuthenticationManager : (10) returns AuthenticatedUser
+AuthenticationManager -[#green]-> LoginController : (11) success
+
+LoginController -[#orange]-> AuthService : (12) generateToken()
+AuthService -[#orange]-> JwtUtil : (13) generateToken(UserDetails)
+JwtUtil -[#orange]-> AuthService : (14) returns JWT
+AuthService -[#orange]-> LoginResponse : (15)
+LoginResponse -[#orange]-> LoginForm : (16) returns token
+
+' === ALTERNATE SPRING DEFAULT FILTER PATH ===
+LoginForm -[#gray,dashed]-> UsernamePasswordAuthenticationFilter : (A) POST /login (Spring Default)
+UsernamePasswordAuthenticationFilter -[#gray,dashed]-> AuthenticationManager : (B) authenticate()
+UsernamePasswordAuthenticationFilter -[#gray,dashed]-> AuthService : (C) generateToken()
+AuthService -[#gray,dashed]-> JwtUtil : (D)
+UsernamePasswordAuthenticationFilter -[#gray,dashed]-> LoginResponse : (E)
+
+@enduml

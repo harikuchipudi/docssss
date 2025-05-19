@@ -1,0 +1,93 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam dpi 150
+
+' ==== FRONTEND ====
+class CoachDashboardUI {
+  +viewAssignedCohorts()
+  +viewSchedule(cohortId)
+  +updateSchedule(scheduleId, ScheduleDTO)
+  +viewCohortDetails(cohortId)
+  +assignTrainer(cohortId, trainerId)
+  +assignMentor(cohortId, mentorId)
+  +assignBhTrainer(cohortId, bhTrainerId)
+}
+
+' ==== CONTROLLER ====
+class CoachDashboardController {
+  +getAssignedCohorts(coachId): List<CohortDTO>
+  +getCohortSchedule(cohortId): List<ScheduleDTO>
+  +updateSchedule(scheduleId, ScheduleDTO): ScheduleDTO
+  +getCohortDetails(cohortId): CohortDetailDTO
+  +assignTrainer(cohortId, trainerId): CohortDTO
+  +assignMentor(cohortId, mentorId): CohortDTO
+  +assignBhTrainer(cohortId, bhTrainerId): CohortDTO
+}
+
+' ==== SERVICE ====
+class CoachDashboardService {
+  +getAssignedCohorts(coachId): List<CohortDTO>
+  +getCohortSchedule(cohortId): List<ScheduleDTO>
+  +updateSchedule(scheduleId, ScheduleDTO): ScheduleDTO
+  +getCohortDetails(cohortId): CohortDetailDTO
+  +assignTrainer(cohortId, trainerId): CohortDTO
+  +assignMentor(cohortId, mentorId): CohortDTO
+  +assignBhTrainer(cohortId, bhTrainerId): CohortDTO
+}
+
+' ==== REPOSITORIES ====
+interface CohortRepository
+interface ScheduleRepository
+interface TrainerRepository
+interface MentorRepository
+interface BhTrainerRepository
+
+' ==== ENTITIES ====
+class Cohort {
+  -id: Long
+  -title: String
+  -coachId: Long
+  -trainerId: Long
+  -mentorId: Long
+  -bhTrainerId: Long
+}
+
+class Schedule {
+  -id: Long
+  -cohortId: Long
+  -topic: String
+  -date: LocalDate
+}
+
+class Trainer
+class Mentor
+class BhTrainer
+
+' ==== DTOs ====
+class CohortDTO
+class ScheduleDTO
+class CohortDetailDTO
+
+' ==== RELATIONSHIPS ====
+CoachDashboardUI -[#blue]-> CoachDashboardController : (1) Request
+CoachDashboardController -[#green]-> CoachDashboardService : (2) Business logic
+CoachDashboardService -[#orange]-> CohortRepository
+CoachDashboardService -[#orange]-> ScheduleRepository
+CoachDashboardService -[#orange]-> TrainerRepository
+CoachDashboardService -[#orange]-> MentorRepository
+CoachDashboardService -[#orange]-> BhTrainerRepository
+CoachDashboardService -[#green]-> CoachDashboardController : (3) Return
+CoachDashboardController -[#blue]-> CoachDashboardUI : (4) Respond
+
+CohortRepository --> Cohort
+ScheduleRepository --> Schedule
+TrainerRepository --> Trainer
+MentorRepository --> Mentor
+BhTrainerRepository --> BhTrainer
+
+Cohort --> CohortDTO
+Cohort --> CohortDetailDTO
+Schedule --> ScheduleDTO
+
+@enduml
