@@ -1,0 +1,160 @@
+@startuml
+title Coach Dashboard - Component and Class Diagram
+
+package "Frontend (React)" {
+  class CoachDashboard {
+    +viewAssignedCohorts()
+    +viewCohortDetails(cohortId)
+    +listTrainersForCohorts()
+    +listBHTainersForCohorts()
+    +listMentorsForCohorts()
+    +viewPendingTasks()
+    +fillMentorAcknowledgement(date, cohortId, acknowledgement, remarks?)
+  }
+}
+
+package "Controller Layer" {
+  class CoachController {
+    +getAssignedCohorts(coachId)
+    +getCohortDetails(cohortId)
+    +getTrainersForCoach(coachId)
+    +getBHTrainersForCoach(coachId)
+    +getMentorsForCoach(coachId)
+    +getPendingTasks(coachId)
+    +submitMentorAcknowledgement(coachId, date, cohortId, acknowledgement, remarks)
+  }
+}
+
+package "Service Layer" {
+  class CoachService {
+    +fetchAssignedCohorts(coachId)
+    +fetchCohortDetails(cohortId)
+    +fetchTrainersForCoach(coachId)
+    +fetchBHTrainersForCoach(coachId)
+    +fetchMentorsForCoach(coachId)
+    +fetchPendingTasks(coachId)
+    +saveMentorAcknowledgement(coachId, date, cohortId, acknowledgement, remarks)
+  }
+}
+
+package "Repository Layer" {
+  class CohortRepository {
+    +findByCoachId(coachId)
+    +findCohortDetails(cohortId)
+  }
+
+  class TrainerRepository {
+    +findByCoachId(coachId)
+  }
+
+  class BHTrainerRepository {
+    +findByCoachId(coachId)
+  }
+
+  class MentorRepository {
+    +findByCoachId(coachId)
+  }
+
+  class TaskRepository {
+    +findPendingTasksByCoachId(coachId)
+  }
+
+  class MentorAcknowledgementRepository {
+    +save(mentorAcknowledgement)
+    +findByCoachIdAndDate(coachId, date)
+  }
+}
+
+package "Model Layer" {
+  class Cohort {
+    -id
+    -name
+    -students : List<Student>
+    -schedule : List<Schedule>
+    -coachId
+    -mentorId
+    -bhTrainerId
+    -trainerId
+  }
+
+  class Trainer {
+    -id
+    -name
+    -email
+  }
+
+  class Mentor {
+    -id
+    -name
+    -email
+  }
+
+  class Coach {
+    -id
+    -name
+    -email
+  }
+
+  class BHTrainer {
+    -id
+    -name
+    -email
+  }
+
+  class Task {
+    -id
+    -title
+    -description
+    -dueDate
+    -status
+    -cohortId
+  }
+
+  class MentorAcknowledgement {
+    -id
+    -coachId
+    -cohortId
+    -date
+    -acknowledgement (mandatory)
+    -remarks (optional)
+  }
+}
+
+' Frontend → Controller
+CoachDashboard --> CoachController : viewAssignedCohorts()
+CoachDashboard --> CoachController : viewCohortDetails(cohortId)
+CoachDashboard --> CoachController : listTrainersForCohorts()
+CoachDashboard --> CoachController : listBHTainersForCohorts()
+CoachDashboard --> CoachController : listMentorsForCohorts()
+CoachDashboard --> CoachController : viewPendingTasks()
+CoachDashboard --> CoachController : fillMentorAcknowledgement()
+
+' Controller → Service
+CoachController --> CoachService : fetchAssignedCohorts()
+CoachController --> CoachService : fetchCohortDetails()
+CoachController --> CoachService : fetchTrainersForCoach()
+CoachController --> CoachService : fetchBHTrainersForCoach()
+CoachController --> CoachService : fetchMentorsForCoach()
+CoachController --> CoachService : fetchPendingTasks()
+CoachController --> CoachService : saveMentorAcknowledgement()
+
+' Service → Repository
+CoachService --> CohortRepository : findByCoachId()
+CoachService --> CohortRepository : findCohortDetails()
+CoachService --> TrainerRepository : findByCoachId()
+CoachService --> BHTrainerRepository : findByCoachId()
+CoachService --> MentorRepository : findByCoachId()
+CoachService --> TaskRepository : findPendingTasksByCoachId()
+CoachService --> MentorAcknowledgementRepository : save()
+CoachService --> MentorAcknowledgementRepository : findByCoachIdAndDate()
+
+' Repository → Model
+CohortRepository --> Cohort
+TrainerRepository --> Trainer
+BHTrainerRepository --> BHTrainer
+MentorRepository --> Mentor
+TaskRepository --> Task
+MentorAcknowledgementRepository --> MentorAcknowledgement
+CoachController --> Coach
+
+@enduml

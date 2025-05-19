@@ -1,0 +1,184 @@
+@startuml
+title Lead Dashboard - Component and Class Diagram (with Learning Path)
+
+package "Frontend (React)" {
+  class LeadDashboard {
+    +viewServiceLines()
+    +viewCohorts(domainId)
+    +viewCohortDetails(cohortId)
+    +listAllRoles()
+    +createRole(roleType, details)
+    +updateRole(roleId, roleType, details)
+    +deleteRole(roleId, roleType)
+    
+    +listLearningPaths()
+    +createLearningPath(details)
+    +updateLearningPath(pathId, details)
+    +deleteLearningPath(pathId)
+  }
+}
+
+package "Controller Layer" {
+  class ServiceLineController {
+    +getAllServiceLines()
+    +getCohortsByDomain(domainId)
+    +getCohortDetails(cohortId)
+  }
+
+  class RoleManagementController {
+    +getAllRoles()
+    +createRole(roleType, details)
+    +updateRole(roleId, roleType, details)
+    +deleteRole(roleId, roleType)
+  }
+
+  class LearningPathController {
+    +getAllLearningPaths()
+    +createLearningPath(details)
+    +updateLearningPath(pathId, details)
+    +deleteLearningPath(pathId)
+  }
+}
+
+package "Service Layer" {
+  class ServiceLineService {
+    +fetchAllServiceLines()
+    +fetchCohorts(domainId)
+    +fetchCohortDetails(cohortId)
+  }
+
+  class RoleManagementService {
+    +getAllRoles()
+    +createRole(roleType, details)
+    +updateRole(roleId, roleType, details)
+    +deleteRole(roleId, roleType)
+  }
+
+  class LearningPathService {
+    +getAllLearningPaths()
+    +createLearningPath(details)
+    +updateLearningPath(pathId, details)
+    +deleteLearningPath(pathId)
+  }
+}
+
+package "Repository Layer" {
+  class ServiceLineRepository {
+    +findAll()
+  }
+
+  class CohortRepository {
+    +findByDomainId(domainId)
+    +findCohortDetails(cohortId)
+  }
+
+  class RoleRepository {
+    +findAllRoles()
+    +save(role)
+    +update(role)
+    +deleteById(roleId)
+  }
+
+  class LearningPathRepository {
+    +findAll()
+    +save(learningPath)
+    +update(learningPath)
+    +deleteById(pathId)
+  }
+}
+
+package "Model Layer" {
+  class ServiceLine {
+    -id
+    -name
+    -cohorts : List<Cohort>
+  }
+
+  class Cohort {
+    -id
+    -name
+    -students : List<Student>
+    -schedule : List<Schedule>
+    -coachId
+    -mentorId
+    -bhTrainerId
+    -trainerId
+  }
+
+  class Trainer {
+    -id
+    -name
+    -email
+  }
+
+  class Mentor {
+    -id
+    -name
+    -email
+  }
+
+  class Coach {
+    -id
+    -name
+    -email
+  }
+
+  class BHTrainer {
+    -id
+    -name
+    -email
+  }
+
+  class LearningPath {
+    -id
+    -title
+    -description
+    -duration
+    -modules : List<Module>
+  }
+
+  class Module {
+    -id
+    -name
+    -content
+  }
+}
+
+' Frontend → Controller
+LeadDashboard --> ServiceLineController : viewServiceLines()
+LeadDashboard --> ServiceLineController : viewCohorts(domainId)
+LeadDashboard --> ServiceLineController : viewCohortDetails(cohortId)
+LeadDashboard --> RoleManagementController : listAllRoles()
+LeadDashboard --> RoleManagementController : create/update/deleteRole()
+LeadDashboard --> LearningPathController : listLearningPaths()
+LeadDashboard --> LearningPathController : create/update/deleteLearningPath()
+
+' Controller → Service
+ServiceLineController --> ServiceLineService : fetchAllServiceLines()
+ServiceLineController --> ServiceLineService : fetchCohorts()
+ServiceLineController --> ServiceLineService : fetchCohortDetails()
+RoleManagementController --> RoleManagementService : getAllRoles()
+RoleManagementController --> RoleManagementService : create/update/deleteRole()
+LearningPathController --> LearningPathService : getAllLearningPaths()
+LearningPathController --> LearningPathService : create/update/deleteLearningPath()
+
+' Service → Repository
+ServiceLineService --> ServiceLineRepository : findAll()
+ServiceLineService --> CohortRepository : findByDomainId()
+ServiceLineService --> CohortRepository : findCohortDetails()
+RoleManagementService --> RoleRepository : findAllRoles()
+RoleManagementService --> RoleRepository : save/update/deleteById()
+LearningPathService --> LearningPathRepository : findAll()
+LearningPathService --> LearningPathRepository : save/update/deleteById()
+
+' Repository → Model
+ServiceLineRepository --> ServiceLine
+CohortRepository --> Cohort
+RoleRepository --> Trainer
+RoleRepository --> Mentor
+RoleRepository --> BHTrainer
+RoleRepository --> Coach
+LearningPathRepository --> LearningPath
+LearningPath --> Module
+
+@enduml

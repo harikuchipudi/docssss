@@ -1,0 +1,104 @@
+@startuml
+title Trainer Dashboard - Component & Data Flow Diagram
+
+package "Frontend (React)" {
+  class TrainerDashboard {
+    +viewAssignedCohorts()
+    +viewCohortDetails(cohortId)
+    +viewPendingAcknowledgements()
+    +submitAcknowledgement(connectId, topicId, contributionHours)
+  }
+}
+
+package "Controller Layer" {
+  class CohortController {
+    +getCohortsByTrainer(trainerId)
+    +getCohortDetails(cohortId)
+  }
+
+  class TrainerConnectController {
+    +getPendingConnects(trainerId)
+    +submitAcknowledgement(connectId, topicId, contributionHours)
+  }
+}
+
+package "Service Layer" {
+  class CohortService {
+    +fetchCohortsByTrainer(trainerId)
+    +fetchCohortDetails(cohortId)
+  }
+
+  class TrainerConnectService {
+    +fetchPendingConnects(trainerId)
+    +acknowledgeConnect(connectId, topicId, contributionHours)
+  }
+}
+
+package "Repository Layer" {
+  class CohortRepository {
+    +findByTrainerId(trainerId)
+    +findCohortDetails(cohortId)
+  }
+
+  class TrainerConnectRepository {
+    +findPendingByTrainerId(trainerId)
+    +updateAcknowledgement(connectId, topicId, contributionHours)
+  }
+
+  class TopicRepository {
+    +findById(topicId)
+  }
+}
+
+package "Model Layer" {
+  class Cohort {
+    -id
+    -name
+    -students : List<Student>
+    -schedule : List<Schedule>
+    -coachId
+    -mentorId
+    -bhTrainerId
+  }
+
+  class TrainerConnect {
+    -id
+    -trainerId
+    -cohortId
+    -date
+    -acknowledged : boolean
+    -topicId : Long
+    -contributionHours : Double
+  }
+
+  class Topic {
+    -id
+    -title
+    -description
+  }
+}
+
+' Frontend → Controller
+TrainerDashboard --> CohortController : viewAssignedCohorts()
+TrainerDashboard --> CohortController : viewCohortDetails(cohortId)
+TrainerDashboard --> TrainerConnectController : viewPendingAcknowledgements()
+TrainerDashboard --> TrainerConnectController : submitAcknowledgement()
+
+' Controller → Service
+CohortController --> CohortService : fetchCohortsByTrainer()
+CohortController --> CohortService : fetchCohortDetails()
+TrainerConnectController --> TrainerConnectService : fetchPendingConnects()
+TrainerConnectController --> TrainerConnectService : acknowledgeConnect()
+
+' Service → Repository
+CohortService --> CohortRepository : findByTrainerId()
+CohortService --> CohortRepository : findCohortDetails()
+TrainerConnectService --> TrainerConnectRepository : findPendingByTrainerId()
+TrainerConnectService --> TrainerConnectRepository : updateAcknowledgement()
+TrainerConnectService --> TopicRepository : findById()
+
+' Repository → Model
+CohortRepository --> Cohort
+TrainerConnectRepository --> TrainerConnect
+TopicRepository --> Topic
+@enduml

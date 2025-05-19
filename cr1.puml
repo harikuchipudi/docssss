@@ -1,0 +1,219 @@
+@startuml
+title CR Dashboard - Component and Class Diagram
+
+'====== Frontend Layer ======
+package "Frontend (React)" {
+  class CohortRepDashboard {
+    +viewCohortStudents()
+    +viewTrainerDetails()
+    +viewBHTrainerDetails()
+    +viewMentorDetails()
+    +viewCoachDetails()
+    +viewSchedule()
+    +viewPendingTasks()
+    +acknowledgeTrainerConnect(response, remarks)
+    +acknowledgeCoachConnect(response, remarks)
+    +acknowledgeBHTrainerConnect(response, remarks)
+    +acknowledgeMentorConnect(response, remarks)
+    +markDailyAttendance(status)
+  }
+}
+
+'====== Controller Layer ======
+package "Controller Layer" {
+  class CRController {
+    +getCohortStudents()
+    +getTrainerDetails()
+    +getBHTrainerDetails()
+    +getMentorDetails()
+    +getCoachDetails()
+    +getSchedule()
+    +getPendingTasksByCohort(cohortId)
+    +submitTrainerConnectAck(response, remarks)
+    +submitCoachConnectAck(response, remarks)
+    +submitBHTrainerConnectAck(response, remarks)
+    +submitMentorConnectAck(response, remarks)
+    +markAttendance(status)
+  }
+}
+
+note bottom of CRController
+== Controller Layer Methods ==
+• getCohortStudents()
+• getTrainerDetails()
+• getBHTrainerDetails()
+• getMentorDetails()
+• getCoachDetails()
+• getSchedule()
+• getPendingTasksByCohort(cohortId)
+• submitTrainerConnectAck(response, remarks)
+• submitCoachConnectAck(response, remarks)
+• submitBHTrainerConnectAck(response, remarks)
+• submitMentorConnectAck(response, remarks)
+• markAttendance(status)
+end note
+
+'====== Service Layer ======
+package "Service Layer" {
+  class CRService {
+    +fetchCohortStudents()
+    +fetchTrainerDetails()
+    +fetchBHTrainerDetails()
+    +fetchMentorDetails()
+    +fetchCoachDetails()
+    +fetchSchedule()
+    +fetchPendingTasks(cohortId)
+    +saveTrainerConnectAck(response, remarks)
+    +saveCoachConnectAck(response, remarks)
+    +saveBHTrainerConnectAck(response, remarks)
+    +saveMentorConnectAck(response, remarks)
+    +recordAttendance(status)
+  }
+}
+
+note bottom of CRService
+== Service Layer Methods ==
+• fetchCohortStudents()
+• fetchTrainerDetails()
+• fetchBHTrainerDetails()
+• fetchMentorDetails()
+• fetchCoachDetails()
+• fetchSchedule()
+• fetchPendingTasks(cohortId)
+• saveTrainerConnectAck(response, remarks)
+• saveCoachConnectAck(response, remarks)
+• saveBHTrainerConnectAck(response, remarks)
+• saveMentorConnectAck(response, remarks)
+• recordAttendance(status)
+end note
+
+'====== Repository Layer ======
+package "Repository Layer" {
+  class StudentRepository
+  class TrainerRepository
+  class BHTrainerRepository
+  class MentorRepository
+  class CohortRepository
+  class CoachRepository
+  class ScheduleRepository
+  class AcknowledgementRepository
+}
+
+note bottom of StudentRepository
+== Repository Layer Methods ==
+StudentRepository:
+• findByCohortId(cohortId)
+
+TrainerRepository:
+• findByCohortId(cohortId)
+
+BHTrainerRepository:
+• findByCohortId(cohortId)
+
+MentorRepository:
+• findByCohortId(cohortId)
+
+CohortRepository:
+• findPendingTasksByCohortId(cohortId)
+
+CoachRepository:
+• findByCohortId(cohortId)
+
+ScheduleRepository:
+• findByCohortId(cohortId)
+
+AcknowledgementRepository:
+• saveTrainerConnectAck(ack)
+• saveCoachConnectAck(ack)
+• saveBHTrainerConnectAck(ack)
+• saveMentorConnectAck(ack)
+• saveDailyAttendance(attendance)
+• findByCohortIdAndDateAndType(cohortId, date, type)
+end note
+
+'====== Model Layer ======
+package "Model Layer" {
+  class Student {
+    -id
+    -name
+    -email
+  }
+
+  class Trainer {
+    -id
+    -name
+    -email
+  }
+
+  class BHTrainer {
+    -id
+    -name
+    -email
+  }
+
+  class Mentor {
+    -id
+    -name
+    -email
+  }
+
+  class Coach {
+    -id
+    -name
+    -email
+  }
+
+  class Schedule {
+    -id
+    -day
+    -session
+    -time
+  }
+
+  class Acknowledgement {
+    -id
+    -type
+    -date
+    -cohortId
+    -response
+    -remarks
+  }
+
+  class Attendance {
+    -id
+    -date
+    -cohortId
+    -status
+  }
+}
+
+'====== Connections ======
+
+' Frontend → Controller
+CohortRepDashboard --> CRController : call APIs for all functions
+
+' Controller → Service
+CRController --> CRService : delegate methods
+
+' Service → Repository
+CRService --> StudentRepository : fetchCohortStudents()
+CRService --> TrainerRepository : fetchTrainerDetails()
+CRService --> BHTrainerRepository : fetchBHTrainerDetails()
+CRService --> MentorRepository : fetchMentorDetails()
+CRService --> CoachRepository : fetchCoachDetails()
+CRService --> ScheduleRepository : fetchSchedule()
+CRService --> CohortRepository : findPendingTasksByCohortId()
+CRService --> AcknowledgementRepository : save + fetch Acks
+CRService --> AcknowledgementRepository : saveDailyAttendance()
+
+' Repository → Model
+StudentRepository --> Student
+TrainerRepository --> Trainer
+BHTrainerRepository --> BHTrainer
+MentorRepository --> Mentor
+CoachRepository --> Coach
+ScheduleRepository --> Schedule
+AcknowledgementRepository --> Acknowledgement
+AcknowledgementRepository --> Attendance
+
+@enduml
